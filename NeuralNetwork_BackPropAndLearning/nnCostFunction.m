@@ -62,13 +62,57 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% Feeding forward
 
+X = [ones(m, 1) X];
+z_2 = X * Theta1'; 
+a_2 = sigmoid(z_2); % 5000 x 25
 
+a_2 = [ones(size(a_2, 1), 1) a_2];
+z_3 = a_2 * Theta2';
 
+h_x = sigmoid(z_3); % 5000 x 10
 
+% Computing the cost
 
+y_matrix = eye(num_labels)(y,:);
 
+total_m = zeros(m ,1);
 
+for i = 1:num_labels
+  y_double = y_matrix(:,i);
+  h_double = h_x(:,i);
+  
+  temp_total = (-y_double.*log(h_double) - (1.-y_double).*log(1.-h_double));
+  total_m += temp_total;
+end
+
+J = (1/m)*sum(total_m);
+
+theta1_v = Theta1(:,2:end)(:);
+theta1_sum = sum(theta1_v.*theta1_v);
+theta2_v = Theta2(:,2:end)(:);
+theta2_sum = sum(theta2_v.*theta2_v);
+
+J = J + (lambda/(2*m))*(theta1_sum + theta2_sum);
+
+%computing the gradient for each layer of Theta
+
+D2 = zeros(num_labels, size(a_2, 2)); %10 x 26
+D1 = zeros(size(z_2, 2), size(X, 2)); % 25 x 401
+
+for i = 1:m 
+  delta_3 =  (h_x(i,:) - y_matrix(i,:))'; %10 x 1
+  delta_2 = Theta2(:,2:end)'*delta_3.*sigmoidGradient(z_2(i,:)'); %25 x 1
+  D2 = D2 + delta_3*a_2(i,:);
+  D1 = D1 + delta_2*X(i,:);
+end
+
+Theta1(:,1) = 0;
+Theta2(:,1) = 0;
+
+Theta1_grad = (1/m).*D1 + (lambda/m).*Theta1;
+Theta2_grad = (1/m).*D2 + (lambda/m).*Theta2;
 
 
 
