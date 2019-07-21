@@ -30,7 +30,7 @@ cost = (1/(2*m))*(sum(error));
 theta_reg = theta(2:end);
 sum_reg = sum(theta_reg.*theta_reg);
 
-J = cost + (lambda/(2*m))*sum_reg
+J = cost + (lambda/(2*m))*sum_reg;
 
 %computing gradient
 error = h_x - y;
