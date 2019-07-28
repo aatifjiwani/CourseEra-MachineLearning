@@ -23,10 +23,37 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+values = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
+m = size(values, 1);
 
+errorMax = intmax("uint32");
+C_max = 0;
+Sig_max = 0;
 
+for c_ind = 1:m
+  for o_ind = 1:m
+  
+    c_check = values(c_ind);
+    o_check = values(o_ind);
+    
+    model = svmTrain(X, y, c_check, @(x1, x2) gaussianKernel(x1, x2, o_check));
+    predictions = svmPredict(model, Xval);
+    error = mean(double(predictions ~= yval));
+    
+    if (error < errorMax)
+    
+      errorMax = error;
+      C_max = c_check;
+      Sig_max = o_check;
+      
+    endif
+    
+    
+  end
+end
 
-
+C = C_max;
+sigma = Sig_max;
 
 
 % =========================================================================

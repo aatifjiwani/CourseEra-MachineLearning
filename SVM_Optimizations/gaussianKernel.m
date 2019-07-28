@@ -15,7 +15,11 @@ sim = 0;
 %               sigma
 %
 %
+sub = x1 - x2;
+norm_sq = sub'*sub;
 
+two_sig = 2*(sigma^2);
+sim = exp((-norm_sq)/two_sig);
 
 
 
