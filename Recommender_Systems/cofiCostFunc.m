@@ -39,11 +39,53 @@ Theta_grad = zeros(size(Theta));
 %        Theta_grad - num_users x num_features matrix, containing the 
 %                     partial derivatives w.r.t. to each element of Theta
 %
+cost_total = 0;
 
+%for i = 1:num_movies
+%  for j = 1:num_users
+%    if (R(i,j) == 1)
+%      pred = Theta(j,:)*X(i,:)';
+%      cost = (pred-Y(i,j))^2;
+%      cost_total = cost_total + cost;
+%      
+%    endif
+%  end
+%end
 
+pred = (X*Theta').*R;
+pred_y = Y.*R;
+cost = pred-pred_y;
+cost_total = sum(sum(cost.*cost));
 
+J = cost_total / 2;
 
+J = J + ((lambda/2)*sum(sum(Theta.*Theta))) + ((lambda/2)*sum(sum(X.*X)));
 
+for i = 1:num_movies
+  movie = X(i,:); % 1 x K
+  did_predict = R(i,:);
+  
+  pred = (movie*Theta').*did_predict; % 1 x nU
+  pred_y = (Y(i,:).*did_predict);
+  
+  cost = pred-pred_y; % 1 x nU
+  
+  X_grad(i,:) = cost*Theta + lambda.*movie;
+  
+  
+end
+
+for j = 1:num_users
+  user = Theta(j,:); % 1 x K
+  did_predict = R(:,j)'; % 1 x nM
+  
+  pred = (user*X').*did_predict; % 1 x nM
+  pred_y = (Y(:,j)'.*did_predict);
+  
+  cost = pred-pred_y;
+  
+  Theta_grad(j,:) = cost*X + lambda.*user;
+end
 
 
 
